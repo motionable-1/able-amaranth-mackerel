@@ -138,7 +138,7 @@ export const FadeInChars: React.FC<TextAnimationPresetProps> = ({
     style={style}
     startFrom={startFrom}
     createTimeline={({ textRef, tl, SplitText }) => {
-      const split = new SplitText(textRef.current, { type: "chars" });
+      const split = new SplitText(textRef.current, { type: "words,chars" });
       tl.from(split.chars, { opacity: 0, y: 20, duration, stagger, ease });
       return tl;
     }}
@@ -216,7 +216,7 @@ export const ScrambleText: React.FC<TextAnimationPresetProps> = ({
     style={style}
     startFrom={startFrom}
     createTimeline={({ textRef, tl, SplitText }) => {
-      const split = new SplitText(textRef.current, { type: "chars" });
+      const split = new SplitText(textRef.current, { type: "words,chars" });
       tl.from(split.chars, {
         opacity: 0,
         scale: 0,
@@ -249,7 +249,7 @@ export const BounceChars: React.FC<TextAnimationPresetProps> = ({
     style={style}
     startFrom={startFrom}
     createTimeline={({ textRef, tl, SplitText }) => {
-      const split = new SplitText(textRef.current, { type: "chars" });
+      const split = new SplitText(textRef.current, { type: "words,chars" });
       tl.from(split.chars, {
         opacity: 0,
         y: -50,
@@ -283,7 +283,7 @@ export const FlipInChars: React.FC<TextAnimationPresetProps> = ({
     perspective={800}
     startFrom={startFrom}
     createTimeline={({ textRef, tl, SplitText }) => {
-      const split = new SplitText(textRef.current, { type: "chars" });
+      const split = new SplitText(textRef.current, { type: "words,chars" });
       tl.from(split.chars, {
         opacity: 0,
         rotationX: -90,
@@ -353,7 +353,7 @@ export const WaveText: React.FC<
     style={style}
     startFrom={startFrom}
     createTimeline={({ textRef, tl, SplitText }) => {
-      const split = new SplitText(textRef.current, { type: "chars" });
+      const split = new SplitText(textRef.current, { type: "words,chars" });
       tl.from(split.chars, {
         y: amplitude,
         opacity: 0,
@@ -412,7 +412,7 @@ export const SlideInText: React.FC<
       style={style}
       startFrom={startFrom}
       createTimeline={({ textRef, tl, SplitText }) => {
-        const split = new SplitText(textRef.current, { type: "chars" });
+        const split = new SplitText(textRef.current, { type: "words,chars" });
         tl.from(split.chars, {
           ...offset,
           opacity: 0,
@@ -461,7 +461,7 @@ export const HackerText: React.FC<
     style={style}
     startFrom={startFrom}
     createTimeline={({ textRef, tl, SplitText }) => {
-      const split = new SplitText(textRef.current, { type: "chars" });
+      const split = new SplitText(textRef.current, { type: "words,chars" });
       const charsArray = chars.split("");
 
       // Animate each character
@@ -591,7 +591,7 @@ export const BlurReveal: React.FC<TextAnimationPresetProps> = ({
     style={style}
     startFrom={startFrom}
     createTimeline={({ textRef, tl, SplitText }) => {
-      const split = new SplitText(textRef.current, { type: "chars" });
+      const split = new SplitText(textRef.current, { type: "words,chars" });
       tl.from(split.chars, {
         opacity: 0,
         filter: "blur(10px)",
@@ -624,7 +624,7 @@ export const GlitchText: React.FC<TextAnimationPresetProps> = ({
     style={style}
     startFrom={startFrom}
     createTimeline={({ textRef, tl, SplitText }) => {
-      const split = new SplitText(textRef.current, { type: "chars" });
+      const split = new SplitText(textRef.current, { type: "words,chars" });
       tl.from(split.chars, {
         opacity: 0,
         x: () => (Math.random() - 0.5) * 20,
