@@ -1,55 +1,147 @@
-import { AbsoluteFill, Artifact, useCurrentFrame, useVideoConfig } from "remotion";
-import { loadFont } from "@remotion/google-fonts/SpaceMono";
+import { AbsoluteFill, Audio, Sequence, Artifact, useCurrentFrame } from "remotion";
+import {
+  TransitionSeries,
+  linearTiming,
+} from "@remotion/transitions";
+import { loadFont as loadInter } from "@remotion/google-fonts/Inter";
+import { blurDissolve } from "../library/components/layout/transitions/presentations/blurDissolve";
+import { push } from "../library/components/layout/transitions/presentations/push";
+import { Background } from "./Background";
+import { IntroScene } from "./IntroScene";
+import { FeatureScene } from "./FeatureScene";
+import { CTAScene } from "./CTAScene";
 
-const LoaderDots = () => {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
+const { fontFamily } = loadInter("normal", {
+  weights: ["400", "500", "600", "700", "800"],
+  subsets: ["latin"],
+});
 
-  const dot = (index: number) => {
-    const phase = (frame / fps) * 2 * Math.PI + index * 0.8;
-    return 0.35 + Math.max(0, Math.sin(phase)) * 0.65;
-  };
+// Audio
+const WHOOSH_SFX =
+  "https://pub-e3bfc0083b0644b296a7080b21024c5f.r2.dev/sfx/1773082050193_qpfrad0m7l_sfx_Smooth_modern_digital_whoosh_t.mp3";
+const CHIME_SFX =
+  "https://pub-e3bfc0083b0644b296a7080b21024c5f.r2.dev/sfx/1773082053341_u4ycduzznnc_sfx_Soft_uplifting_chime_notificat.mp3";
 
-  return (
-    <span className="inline-flex gap-1">
-      {[0, 1, 2].map((i) => (
-        <span
-          key={i}
-          className="inline-block text-sky-300"
-          style={{ opacity: dot(i) }}
-        >
-          .
-        </span>
-      ))}
-    </span>
-  );
-};
+// Icons
+const ICON_EMAIL =
+  "https://api.iconify.design/ph/envelope-simple-fill.svg?color=%23FFE01B&width=48";
+const ICON_LIGHTNING =
+  "https://api.iconify.design/ph/lightning-fill.svg?color=%23FFE01B&width=48";
+const ICON_ROCKET =
+  "https://api.iconify.design/ph/rocket-launch-fill.svg?color=%23FFE01B&width=48";
+
+// Timeline (in frames at 30fps)
+const INTRO_DUR = 120; // 4s
+const FEATURE1_DUR = 110; // ~3.7s
+const FEATURE2_DUR = 110;
+const FEATURE3_DUR = 110;
+const CTA_DUR = 120; // 4s
+const TRANSITION_DUR = 18; // 0.6s per transition
 
 export const Main: React.FC = () => {
-  const { fontFamily } = loadFont();
   const frame = useCurrentFrame();
+
+  // Calculate when each transition starts for SFX timing
+  const t1Start = INTRO_DUR - TRANSITION_DUR;
+  const t2Start = t1Start + FEATURE1_DUR - TRANSITION_DUR;
+  const t3Start = t2Start + FEATURE2_DUR - TRANSITION_DUR;
+  const t4Start = t3Start + FEATURE3_DUR - TRANSITION_DUR;
+
   return (
     <>
-      {/* Leave this here to generate a thumbnail */}
       {frame === 0 && (
         <Artifact content={Artifact.Thumbnail} filename="thumbnail.jpeg" />
       )}
-      <AbsoluteFill className="flex items-center justify-center bg-[#0f1115]">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(99,102,241,0.28),transparent_45%),radial-gradient(circle_at_70%_60%,rgba(16,185,129,0.2),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(180deg,rgba(255,255,255,0.05)_1px,transparent_1px)] [background-size:48px_48px] opacity-40" />
-        <div
-          className="flex flex-col items-center gap-4 text-center text-white drop-shadow-[0_12px_32px_rgba(0,0,0,0.55)]"
-          style={{ fontFamily, fontWeight: 700, letterSpacing: "0.01em" }}
-        >
-          <div className="text-4xl md:text-5xl font-bold">
-            <span className="font-extrabold text-sky-300">TypeFrames</span> is
-            building your video
-            <LoaderDots />
-          </div>
-          <div className="text-base md:text-lg text-white/70">
-            Rendering scenes, timing transitions, and polishing frames.
-          </div>
-        </div>
+      <AbsoluteFill style={{ fontFamily }}>
+        {/* Background layer - white for feature scenes */}
+        <Sequence durationInFrames={t4Start} premountFor={30}>
+          <Background variant="intro" />
+        </Sequence>
+
+        {/* Background layer - teal for CTA */}
+        <Sequence from={t4Start} premountFor={30}>
+          <Background variant="cta" />
+        </Sequence>
+
+        {/* Main scene transitions */}
+        <TransitionSeries>
+          {/* Scene 1: Intro */}
+          <TransitionSeries.Sequence durationInFrames={INTRO_DUR}>
+            <IntroScene />
+          </TransitionSeries.Sequence>
+
+          <TransitionSeries.Transition
+            presentation={push("left")}
+            timing={linearTiming({ durationInFrames: TRANSITION_DUR })}
+          />
+
+          {/* Scene 2: Feature 1 - Email & SMS */}
+          <TransitionSeries.Sequence durationInFrames={FEATURE1_DUR}>
+            <FeatureScene
+              icon={ICON_EMAIL}
+              title="Email & SMS Marketing Made Easy"
+              description="Intuitive drag-and-drop tools that make creating stunning campaigns effortless — no expertise required."
+              featureNumber="01"
+              accentSide="left"
+            />
+          </TransitionSeries.Sequence>
+
+          <TransitionSeries.Transition
+            presentation={blurDissolve()}
+            timing={linearTiming({ durationInFrames: TRANSITION_DUR })}
+          />
+
+          {/* Scene 3: Feature 2 - AI Automations */}
+          <TransitionSeries.Sequence durationInFrames={FEATURE2_DUR}>
+            <FeatureScene
+              icon={ICON_LIGHTNING}
+              title="AI-Powered Automations That Drive Sales"
+              description="Personalized, high-impact campaigns on autopilot — powered by smart data and machine learning."
+              featureNumber="02"
+              accentSide="right"
+            />
+          </TransitionSeries.Sequence>
+
+          <TransitionSeries.Transition
+            presentation={push("left")}
+            timing={linearTiming({ durationInFrames: TRANSITION_DUR })}
+          />
+
+          {/* Scene 4: Feature 3 - Migration */}
+          <TransitionSeries.Sequence durationInFrames={FEATURE3_DUR}>
+            <FeatureScene
+              icon={ICON_ROCKET}
+              title="Seamless Migration & Dedicated Onboarding"
+              description="Switch platforms effortlessly with hands-on support from our expert onboarding team."
+              featureNumber="03"
+              accentSide="left"
+            />
+          </TransitionSeries.Sequence>
+
+          <TransitionSeries.Transition
+            presentation={blurDissolve()}
+            timing={linearTiming({ durationInFrames: TRANSITION_DUR })}
+          />
+
+          {/* Scene 5: CTA */}
+          <TransitionSeries.Sequence durationInFrames={CTA_DUR + 30}>
+            <CTAScene />
+          </TransitionSeries.Sequence>
+        </TransitionSeries>
+
+        {/* Sound effects on transitions */}
+        <Sequence from={t1Start} premountFor={5}>
+          <Audio src={WHOOSH_SFX} volume={0.3} />
+        </Sequence>
+        <Sequence from={t2Start} premountFor={5}>
+          <Audio src={WHOOSH_SFX} volume={0.25} />
+        </Sequence>
+        <Sequence from={t3Start} premountFor={5}>
+          <Audio src={WHOOSH_SFX} volume={0.3} />
+        </Sequence>
+        <Sequence from={t4Start} premountFor={5}>
+          <Audio src={CHIME_SFX} volume={0.35} />
+        </Sequence>
       </AbsoluteFill>
     </>
   );
